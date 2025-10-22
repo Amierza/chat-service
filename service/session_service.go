@@ -177,7 +177,7 @@ func (ss *sessionService) Start(ctx context.Context, thesisID string) (*dto.Sess
 	sessionID := uuid.New()
 	session := &entity.Session{
 		ID:          sessionID,
-		Status:      "waiting",
+		Status:      constants.ENUM_SESSION_STATUS_WAITING,
 		UserIDOwner: userID,
 		ThesisID:    tID,
 	}
@@ -385,8 +385,17 @@ func (ss *sessionService) Join(ctx context.Context, sessionID string) (*dto.Sess
 		return &dto.SessionResponse{}, dto.ErrNotFound
 	}
 
+	// cannot join if session is already process messages for summary
+	if session.Status == constants.ENUM_SESSION_STATUS_PROCESSING_SUMMARY {
+		ss.logger.Error("failed to join session because session is already process messages for summary",
+			zap.String("session_id", sessionID),
+			zap.Error(err),
+		)
+		return &dto.SessionResponse{}, dto.ErrSessionFinished
+	}
+
 	// cannot join if session is finished
-	if session.Status == "finished" {
+	if session.Status == constants.ENUM_SESSION_STATUS_FINSIHED {
 		ss.logger.Error("failed to join session because session is finished",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
@@ -404,7 +413,7 @@ func (ss *sessionService) Join(ctx context.Context, sessionID string) (*dto.Sess
 	}
 
 	now := time.Now()
-	if session.Status == "waiting" {
+	if session.Status == constants.ENUM_SESSION_STATUS_WAITING {
 		session.StartTime = &now
 	}
 
@@ -521,7 +530,7 @@ func (ss *sessionService) Join(ctx context.Context, sessionID string) (*dto.Sess
 	}
 
 	if update {
-		session.Status = "ongoing"
+		session.Status = constants.ENUM_SESSION_STATUS_ONGOING
 		// update session -> join & start session -> status = ongoing
 		if err := ss.sessionRepo.UpdateSession(ctx, nil, session); err != nil {
 			ss.logger.Error("failed to update session to ongoing",
@@ -614,14 +623,21 @@ func (ss *sessionService) Leave(ctx context.Context, sessionID string) (*dto.Ses
 	}
 
 	// cannot leave if session is not ongoing
-	if session.Status == "waiting" {
+	if session.Status == constants.ENUM_SESSION_STATUS_WAITING {
 		ss.logger.Error("failed to leave session because session has not started yet",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
 		)
 		return &dto.SessionResponse{}, dto.ErrSessionWaiting
 	}
-	if session.Status == "finished" {
+	if session.Status == constants.ENUM_SESSION_STATUS_PROCESSING_SUMMARY {
+		ss.logger.Error("failed to leave session because session is already process messages for summary",
+			zap.String("session_id", sessionID),
+			zap.Error(err),
+		)
+		return &dto.SessionResponse{}, dto.ErrSessionFinished
+	}
+	if session.Status == constants.ENUM_SESSION_STATUS_FINSIHED {
 		ss.logger.Error("failed to leave session because session is finished",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
@@ -815,14 +831,21 @@ func (ss *sessionService) End(ctx context.Context, sessionID string) (*dto.Sessi
 	}
 
 	// only can end if still ongoing
-	if session.Status == "waiting" {
+	if session.Status == constants.ENUM_SESSION_STATUS_WAITING {
 		ss.logger.Error("failed to end session because session has not started yet",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
 		)
 		return &dto.SessionResponse{}, dto.ErrSessionWaiting
 	}
-	if session.Status == "finished" {
+	if session.Status == constants.ENUM_SESSION_STATUS_PROCESSING_SUMMARY {
+		ss.logger.Error("failed to end session because session is already process messages for summary",
+			zap.String("session_id", sessionID),
+			zap.Error(err),
+		)
+		return &dto.SessionResponse{}, dto.ErrSessionFinished
+	}
+	if session.Status == constants.ENUM_SESSION_STATUS_FINSIHED {
 		ss.logger.Error("failed to end session because session is finished",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
@@ -842,7 +865,7 @@ func (ss *sessionService) End(ctx context.Context, sessionID string) (*dto.Sessi
 	}
 
 	now := time.Now()
-	session.Status = "finished"
+	session.Status = constants.ENUM_SESSION_STATUS_PROCESSING_SUMMARY
 	session.EndTime = &now
 	// update session -> join & start session -> status = ongoing
 	if err := ss.sessionRepo.UpdateSession(ctx, nil, session); err != nil {

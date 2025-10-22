@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Amierza/chat-service/constants"
 	"github.com/Amierza/chat-service/dto"
 	"github.com/Amierza/chat-service/jwt"
 	"github.com/Amierza/chat-service/repository"
@@ -80,14 +81,21 @@ func (ms *messageService) Send(ctx context.Context, req dto.SendMessageRequest, 
 	}
 
 	// cannot send if session is not ongoing
-	if session.Status == "waiting" {
+	if session.Status == constants.ENUM_SESSION_STATUS_WAITING {
 		ms.logger.Error("failed to send message because session has not started yet",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
 		)
 		return dto.ErrSessionWaiting
 	}
-	if session.Status == "finished" {
+	if session.Status == constants.ENUM_SESSION_STATUS_PROCESSING_SUMMARY {
+		ms.logger.Error("failed to send message because session is already process messages for summary",
+			zap.String("session_id", sessionID),
+			zap.Error(err),
+		)
+		return dto.ErrSessionFinished
+	}
+	if session.Status == constants.ENUM_SESSION_STATUS_FINSIHED {
 		ms.logger.Error("failed to send message because session is finished",
 			zap.String("session_id", sessionID),
 			zap.Error(err),
@@ -221,10 +229,10 @@ func (ms *messageService) List(ctx context.Context, req response.PaginationReque
 
 	var dataWithPaginate *dto.MessagePaginationRepositoryResponse
 	switch session.Status {
-	case "ongoing":
+	case constants.ENUM_SESSION_STATUS_ONGOING:
 		// 2️⃣ Ambil dari Redis (chat live)
 		dataWithPaginate, err = ms.messageRepo.GetAllMessageFromRedisWithPagination(ctx, nil, req, session)
-	case "finished":
+	case constants.ENUM_SESSION_STATUS_FINSIHED:
 		// 3️⃣ Ambil dari DB (history)
 		dataWithPaginate, err = ms.messageRepo.GetAllMessageWithPagination(ctx, nil, req, session)
 	default:
