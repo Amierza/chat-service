@@ -995,12 +995,10 @@ func (ss *sessionService) End(ctx context.Context, sessionID string) (*dto.Sessi
 		StartedAt:     session.StartTime,
 		EndedAt:       session.EndTime,
 		CreatedAt:     session.CreatedAt,
-		Owner: dto.UserResponse{
+		Owner: dto.CustomUserResponse{
 			ID:         session.UserOwner.ID,
 			Identifier: session.UserOwner.Identifier,
-			Role:       session.UserOwner.Role,
-			Student:    mapStudent(session.UserOwner),
-			Lecturer:   mapLecturer(session.UserOwner),
+			Role:       string(session.UserOwner.Role),
 		},
 		Student: dto.StudentResponse{
 			ID:    session.Thesis.Student.ID,
@@ -1022,6 +1020,14 @@ func (ss *sessionService) End(ctx context.Context, sessionID string) (*dto.Sessi
 			Description: session.Thesis.Description,
 			Progress:    session.Thesis.Progress,
 		},
+	}
+
+	if user.StudentID != nil {
+		task.Owner.Name = user.Student.Name
+	}
+
+	if user.LecturerID != nil {
+		task.Owner.Name = user.Lecturer.Name
 	}
 
 	for _, sup := range session.Thesis.Supervisors {
