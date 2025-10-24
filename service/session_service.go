@@ -1077,8 +1077,12 @@ func (ss *sessionService) End(ctx context.Context, sessionID string) (*dto.Sessi
 		return nil, dto.ErrMarshalToJSON
 	}
 
+	ct, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
 	// Publish message
-	err = ch.Publish(
+	err = ch.PublishWithContext(
+		ct,
 		"",        // exchange
 		queueName, // routing key
 		false,     // mandatory
