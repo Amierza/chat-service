@@ -229,7 +229,8 @@ func (ms *messageService) List(ctx context.Context, req response.PaginationReque
 
 	var dataWithPaginate *dto.MessagePaginationRepositoryResponse
 	switch session.Status {
-	case constants.ENUM_SESSION_STATUS_ONGOING:
+	case constants.ENUM_SESSION_STATUS_ONGOING,
+		constants.ENUM_SESSION_STATUS_PROCESSING_SUMMARY:
 		// 2️⃣ Ambil dari Redis (chat live)
 		dataWithPaginate, err = ms.messageRepo.GetAllMessageFromRedisWithPagination(ctx, nil, req, session)
 	case constants.ENUM_SESSION_STATUS_FINSIHED:

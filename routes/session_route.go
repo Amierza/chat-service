@@ -16,5 +16,6 @@ func Session(route *gin.Engine, sessionHandler handler.ISessionHandler, jwt jwt.
 		routes.POST("/:session_id/end", sessionHandler.End)
 		routes.GET("", sessionHandler.GetAll)
 		routes.GET("/:session_id", sessionHandler.GetDetail)
+		routes.GET("/:session_id/summary", sessionHandler.GetSummary)
 	}
 }

@@ -18,6 +18,7 @@ type (
 		End(ctx *gin.Context)
 		GetAll(ctx *gin.Context)
 		GetDetail(ctx *gin.Context)
+		GetSummary(ctx *gin.Context)
 	}
 
 	sessionHandler struct {
@@ -150,5 +151,19 @@ func (sh *sessionHandler) GetDetail(ctx *gin.Context) {
 	}
 
 	res := response.BuildResponseSuccess(fmt.Sprintf("%s sessions", dto.SUCCESS_GET_DETAIL), result)
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (sh *sessionHandler) GetSummary(ctx *gin.Context) {
+	idStr := ctx.Param("session_id")
+	result, err := sh.sessionService.GetSummary(ctx, &idStr)
+	if err != nil {
+		status := mapErrorToStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s session summary", dto.FAILED_GET_DETAIL), err.Error(), nil)
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(fmt.Sprintf("%s session summary", dto.SUCCESS_GET_DETAIL), result)
 	ctx.JSON(http.StatusOK, res)
 }
