@@ -29,6 +29,7 @@ type (
 		GetAll(ctx context.Context, filter dto.SessionFilterQuery) ([]*dto.SessionResponse, error)
 		GetAllWithPagination(ctx context.Context, req response.PaginationRequest, filter dto.SessionFilterQuery) (dto.SessionPaginationResponse, error)
 		GetDetail(ctx context.Context, id *string) (*dto.SessionResponse, error)
+		GetSummary(ctx context.Context, id *string) (*dto.NoteSummaryResponse, error)
 	}
 
 	sessionService struct {
@@ -1345,4 +1346,38 @@ func (ss *sessionService) GetDetail(ctx context.Context, id *string) (*dto.Sessi
 	)
 
 	return session, nil
+}
+
+func (ss *sessionService) GetSummary(ctx context.Context, id *string) (*dto.NoteSummaryResponse, error) {
+	data, found, err := ss.sessionRepo.GetNoteSummaryBySessionID(ctx, nil, *id)
+	if err != nil {
+		ss.logger.Error("failed to get summary by session id",
+			zap.String("session_id", *id),
+			zap.Error(err),
+		)
+		return nil, err
+	}
+
+	if !found {
+		ss.logger.Warn("summary not found",
+			zap.String("session_id", *id),
+		)
+		return nil, dto.ErrNotFound
+	}
+
+	note := &dto.NoteSummaryResponse{
+		ID:      data.ID,
+		Content: data.Content,
+		Session: dto.CustomSessionResponse{
+			ID:        data.Session.ID,
+			StartTime: data.Session.StartTime,
+			EndTime:   data.Session.EndTime,
+			Status:    data.Session.Status,
+		},
+	}
+	ss.logger.Info("success get detail summary note",
+		zap.String("session_id", *id),
+	)
+
+	return note, nil
 }

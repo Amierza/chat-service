@@ -23,6 +23,7 @@ type (
 		GetActiveSessionBySessionID(ctx context.Context, tx *gorm.DB, sessionID string) (*entity.Session, bool, error)
 		GetAllSessionsByUserID(ctx context.Context, tx *gorm.DB, user *entity.User, filter dto.SessionFilterQuery) ([]*entity.Session, error)
 		GetAllSessionsByUserIDWithPagination(ctx context.Context, tx *gorm.DB, user *entity.User, pagination response.PaginationRequest, filter dto.SessionFilterQuery) (dto.SessionPaginationRepositoryResponse, error)
+		GetNoteSummaryBySessionID(ctx context.Context, tx *gorm.DB, sessionID string) (*entity.Note, bool, error)
 
 		// UPDATE / PATCH
 		UpdateSession(ctx context.Context, tx *gorm.DB, session *entity.Session) error
@@ -274,6 +275,29 @@ func (sr *sessionRepository) GetAllSessionsByUserIDWithPagination(ctx context.Co
 			Count:   count,
 		},
 	}, err
+}
+func (sr *sessionRepository) GetNoteSummaryBySessionID(ctx context.Context, tx *gorm.DB, sessionID string) (*entity.Note, bool, error) {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	note := &entity.Note{}
+	err := tx.WithContext(ctx).
+		Preload("Session.Messages").
+		Preload("Session.Thesis.Supervisors.Lecturer.StudyProgram.Faculty").
+		Preload("Session.Thesis.Student.StudyProgram.Faculty").
+		Preload("Session.UserOwner.Student.StudyProgram.Faculty").
+		Preload("Session.UserOwner.Lecturer.StudyProgram.Faculty").
+		Where("session_id = ?", sessionID).
+		Take(&note).Error
+	if err != nil {
+		return &entity.Note{}, false, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return &entity.Note{}, false, nil
+	}
+
+	return note, true, nil
 }
 
 // UPDATE / PATCH

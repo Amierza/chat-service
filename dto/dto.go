@@ -246,11 +246,12 @@ type (
 // Notification
 type (
 	NotificationResponse struct {
-		ID      uuid.UUID `json:"id"`
-		UserID  uuid.UUID `json:"user_id"`
-		Title   string    `json:"title"`
-		Message string    `json:"message"`
-		IsRead  bool      `json:"is_read"`
+		ID        uuid.UUID `json:"id"`
+		UserID    uuid.UUID `json:"user_id"`
+		Title     string    `json:"title"`
+		Message   string    `json:"message"`
+		IsRead    bool      `json:"is_read"`
+		CreatedAt time.Time `json:"created_at"`
 	}
 )
 
@@ -322,5 +323,20 @@ type (
 		Sender          CustomUserResponse `json:"sender"`
 		ParentMessageID *uuid.UUID         `json:"parent_message_id,omitempty"`
 		Timestamp       string             `json:"timestamp"`
+	}
+)
+
+// Note / Summary
+type (
+	CustomSessionResponse struct {
+		ID        uuid.UUID            `json:"id"`
+		StartTime *time.Time           `json:"start_time,omitempty"`
+		EndTime   *time.Time           `json:"end_time,omitempty"`
+		Status    entity.SessionStatus `json:"status"`
+	}
+	NoteSummaryResponse struct {
+		ID      uuid.UUID             `json:"id"`
+		Content string                `json:"content"`
+		Session CustomSessionResponse `json:"session"`
 	}
 )

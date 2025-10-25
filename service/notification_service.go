@@ -50,11 +50,12 @@ func (ns *notificationService) GetAll(ctx context.Context) ([]*dto.NotificationR
 	notifications := make([]*dto.NotificationResponse, 0, len(datas))
 	for _, data := range datas {
 		notifications = append(notifications, &dto.NotificationResponse{
-			ID:      data.ID,
-			UserID:  data.UserID,
-			Title:   data.Title,
-			Message: data.Message,
-			IsRead:  data.IsRead,
+			ID:        data.ID,
+			UserID:    data.UserID,
+			Title:     data.Title,
+			Message:   data.Message,
+			IsRead:    data.IsRead,
+			CreatedAt: data.CreatedAt,
 		})
 	}
 	ns.logger.Info("success get all notifications",
@@ -95,11 +96,12 @@ func (ns *notificationService) GetDetail(ctx context.Context, id *string) (*dto.
 	)
 
 	notification := &dto.NotificationResponse{
-		ID:      data.ID,
-		UserID:  data.UserID,
-		Title:   data.Title,
-		Message: data.Message,
-		IsRead:  data.IsRead,
+		ID:        data.ID,
+		UserID:    data.UserID,
+		Title:     data.Title,
+		Message:   data.Message,
+		IsRead:    data.IsRead,
+		CreatedAt: data.CreatedAt,
 	}
 	ns.logger.Info("success get detail notification",
 		zap.String("id", *id),
