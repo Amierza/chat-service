@@ -169,19 +169,6 @@ type (
 		TotalStudent int                  `json:"total_student"`
 		StudyProgram StudyProgramResponse `json:"study_program"`
 	}
-	ThesisSummary struct {
-		Title       string          `json:"title"`
-		Description string          `json:"description"`
-		Progress    entity.Progress `json:"progress"`
-	}
-	ThesisResponse struct {
-		ID          uuid.UUID             `gorm:"type:uuid;primaryKey" json:"id"`
-		Title       string                `gorm:"not null" json:"title"`
-		Description string                `json:"description"`
-		Progress    entity.Progress       `json:"progress"`
-		Student     *CustomUserResponse   `json:"student,omitempty"`
-		Supervisors []*CustomUserResponse `json:"supervisors,omitempty"`
-	}
 )
 
 // Authentiation for Admin
@@ -217,6 +204,38 @@ type (
 		Name       string    `json:"name"`
 		Identifier string    `json:"identifier"`
 		Role       string    `json:"role,omitempty"`
+	}
+)
+
+// Thesis
+type (
+	ThesisSummary struct {
+		Title       string          `json:"title"`
+		Description string          `json:"description"`
+		Progress    entity.Progress `json:"progress"`
+	}
+	ThesisResponse struct {
+		ID          uuid.UUID             `json:"id"`
+		Title       string                `json:"title"`
+		Description string                `json:"description"`
+		Progress    entity.Progress       `json:"progress"`
+		Student     *CustomUserResponse   `json:"student,omitempty"`
+		Supervisors []*CustomUserResponse `json:"supervisors,omitempty"`
+	}
+	UpdateThesisRequest struct {
+		ID          string          `json:"-"`
+		Title       string          `binding:"required" json:"title"`
+		Description string          `binding:"required" json:"description"`
+		Progress    entity.Progress `binding:"required" json:"progress"`
+		StudentID   uuid.UUID       `binding:"required" json:"student_id"`
+	}
+	ThesisPaginationResponse struct {
+		response.PaginationResponse
+		Data []*ThesisResponse `json:"data"`
+	}
+	ThesisPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Theses []*entity.Thesis
 	}
 )
 

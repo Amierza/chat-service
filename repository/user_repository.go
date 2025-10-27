@@ -35,9 +35,9 @@ func NewUserRepository(db *gorm.DB) *userRepository {
 // CREATE / POST
 
 // READ / GET
-func (nr *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id string) (*entity.User, bool, error) {
+func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id string) (*entity.User, bool, error) {
 	if tx == nil {
-		tx = nr.db
+		tx = ur.db
 	}
 
 	var user *entity.User

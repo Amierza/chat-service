@@ -16,9 +16,14 @@ const (
 	ENUM_DEGREE_S2 = "s2"
 	ENUM_DEGREE_S3 = "s3"
 
-	ENUM_PROGRESS_BAB1 = "bab1"
-	ENUM_PROGRESS_BAB2 = "bab2"
-	ENUM_PROGRESS_BAB3 = "bab3"
+	ENUM_PROGRESS_BAB1             = "bab1"
+	ENUM_PROGRESS_BAB2             = "bab2"
+	ENUM_PROGRESS_BAB3             = "bab3"
+	ENUM_PROGRESS_BAB4             = "bab4"
+	ENUM_PROGRESS_BAB5             = "bab5"
+	ENUM_PROGRESS_PROPOSAL         = "proposal"
+	ENUM_PROGRESS_SEMINAR_PROPOSAL = "seminar_proposal"
+	ENUM_PROGRESS_SEMINAR_HASIL    = "seminar_hasil"
 
 	ENUM_SESSION_STATUS_WAITING            = "waiting"
 	ENUM_SESSION_STATUS_ONGOING            = "ongoing"
