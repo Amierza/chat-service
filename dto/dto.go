@@ -23,6 +23,12 @@ const (
 	// Query Params
 	MESSAGE_FAILED_INVALID_QUERY_PARAMS = "failed invalid query params"
 
+	// File
+	MESSAGE_FAILED_PARSE_MULTIPART_FORM = "failed to parse multipart form"
+	MESSAGE_FAILED_NO_FILES_UPLOADED    = "failed no files uploaded"
+	MESSAGE_FAILED_FILES_IS_EMPTY       = "failed files is empty"
+	MESSAGE_FAILED_UPLOAD_FILES         = "failed upload files"
+
 	// Authentication
 	FAILED_LOGIN         = "failed login"
 	FAILED_REFRESH_TOKEN = "failed refresh token"
@@ -49,6 +55,9 @@ const (
 	SUCCESS_LOGIN         = "success login"
 	SUCCESS_REFRESH_TOKEN = "success refresh token"
 
+	// File
+	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
+
 	// General Success
 	SUCCESS_CREATE      = "success create"
 	SUCCESS_UPDATE      = "success update"
@@ -71,6 +80,12 @@ var (
 
 	// Unauthorized
 	ErrUnauthorized = errors.New("unauthorized")
+
+	// File
+	ErrNoFilesUploaded    = errors.New("failed no files uploaded")
+	ErrInvalidFileType    = errors.New("only jpg/jpeg/png allowed")
+	ErrSaveFile           = errors.New("failed save file")
+	ErrCreateFolderAssets = errors.New("failed create folder assets")
 
 	// Token
 	ErrGenerateAccessToken           = errors.New("failed to generate access token")
@@ -215,6 +230,12 @@ type (
 		Thesis    ThesisResponse       `json:"thesis"`
 		UserOwner UserResponse         `json:"user_owner"`
 	}
+	CustomSessionResponse struct {
+		ID        uuid.UUID            `json:"id"`
+		StartTime *time.Time           `json:"start_time,omitempty"`
+		EndTime   *time.Time           `json:"end_time,omitempty"`
+		Status    entity.SessionStatus `json:"status"`
+	}
 	// Filter
 	SessionFilterQuery struct {
 		SortBy string `form:"sort"` // ex: latest, oldest
@@ -259,10 +280,9 @@ type (
 type (
 	MessageResponse struct {
 		ID              uuid.UUID          `json:"id"`
-		IsText          bool               `json:"is_text"`
+		IsText          *bool              `json:"is_text"`
 		Text            string             `json:"text"`
 		FileURL         string             `json:"file_url,omitempty"`
-		FileType        string             `json:"file_type,omitempty"`
 		Sender          CustomUserResponse `json:"sender"`
 		ParentMessageID *uuid.UUID         `json:"parent_message_id,omitempty"`
 		Timestamp       string             `json:"timestamp,omitempty"`
@@ -270,20 +290,18 @@ type (
 	MessageEventPublish struct {
 		MessageID       uuid.UUID          `json:"id"`
 		Event           string             `json:"event"`
-		IsText          bool               `json:"is_text"`
+		IsText          *bool              `json:"is_text"`
 		Text            string             `json:"text"`
 		FileURL         string             `json:"file_url,omitempty"`
-		FileType        string             `json:"file_type,omitempty"`
 		Sender          CustomUserResponse `json:"sender"`
 		SessionID       uuid.UUID          `json:"session_id"`
 		ParentMessageID *uuid.UUID         `json:"parent_message_id,omitempty"`
 		Timestamp       string             `json:"timestamp,omitempty"`
 	}
 	SendMessageRequest struct {
-		IsText          bool       `json:"is_text" binding:"required"`
+		IsText          *bool      `json:"is_text" binding:"required"`
 		Text            string     `json:"text" binding:"required"`
 		FileURL         string     `json:"file_url,omitempty"`
-		FileType        string     `json:"file_type,omitempty"`
 		ParentMessageID *uuid.UUID `json:"parent_message_id,omitempty"`
 	}
 	MessagePaginationResponse struct {
@@ -319,7 +337,6 @@ type (
 		IsText          bool               `json:"is_text"`
 		Text            string             `json:"text,omitempty"`
 		FileURL         string             `json:"file_url,omitempty"`
-		FileType        string             `json:"file_type,omitempty"`
 		Sender          CustomUserResponse `json:"sender"`
 		ParentMessageID *uuid.UUID         `json:"parent_message_id,omitempty"`
 		Timestamp       string             `json:"timestamp"`
@@ -328,15 +345,56 @@ type (
 
 // Note / Summary
 type (
-	CustomSessionResponse struct {
-		ID        uuid.UUID            `json:"id"`
-		StartTime *time.Time           `json:"start_time,omitempty"`
-		EndTime   *time.Time           `json:"end_time,omitempty"`
-		Status    entity.SessionStatus `json:"status"`
-	}
 	NoteSummaryResponse struct {
 		ID      uuid.UUID             `json:"id"`
 		Content string                `json:"content"`
 		Session CustomSessionResponse `json:"session"`
+	}
+)
+
+// Schedule
+type (
+	ScheduleResponse struct {
+		ID          uuid.UUID             `json:"id"`
+		ProposedAt  time.Time             `json:"proposed_at"`
+		StartTime   time.Time             `json:"start_time"`
+		EndTime     time.Time             `json:"end_time"`
+		Status      entity.ScheduleStatus `json:"status"`
+		Description string                `json:"description"`
+		Location    string                `json:"location"`
+		Thesis      ThesisResponse        `json:"thesis"`
+		CreatedBy   CustomUserResponse    `json:"created_by"`
+		ApprovedBy  *CustomUserResponse   `json:"approved_by,omitempty"`
+	}
+	CreateScheduleRequest struct {
+		ProposedAt  time.Time `binding:"required" json:"proposed_at"`
+		StartTime   time.Time `binding:"required" json:"start_time"`
+		EndTime     time.Time `binding:"required" json:"end_time"`
+		Description string    `json:"description"`
+		Location    string    `binding:"required" json:"location"`
+	}
+	UpdateScheduleRequest struct {
+		ID          string    `json:"-"`
+		ProposedAt  time.Time `binding:"required" json:"proposed_at"`
+		StartTime   time.Time `binding:"required" json:"start_time"`
+		EndTime     time.Time `binding:"required" json:"end_time"`
+		Description string    `binding:"required" json:"description"`
+		Location    string    `binding:"required" json:"location"`
+	}
+	ApprovalScheduleRequest struct {
+		ID     string                `json:"-"`
+		Status entity.ScheduleStatus `json:"status"`
+	}
+	// Filter
+	ScheduleFilterQuery struct {
+		Status string `form:"status"`
+	}
+	SchedulePaginationResponse struct {
+		response.PaginationResponse
+		Data []*ScheduleResponse `json:"data"`
+	}
+	SchedulePaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Schedules []*entity.Schedule
 	}
 )

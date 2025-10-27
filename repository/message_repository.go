@@ -109,11 +109,10 @@ func (mr *messageRepository) GetAllMessageFromRedisWithPagination(ctx context.Co
 		}
 
 		msg := entity.Message{
-			ID:       evt.MessageID,
-			IsText:   evt.IsText,
-			Text:     evt.Text,
-			FileURL:  evt.FileURL,
-			FileType: evt.FileType,
+			ID:      evt.MessageID,
+			IsText:  *evt.IsText,
+			Text:    evt.Text,
+			FileURL: evt.FileURL,
 			Sender: entity.User{
 				ID:         evt.Sender.ID,
 				Identifier: evt.Sender.Identifier,

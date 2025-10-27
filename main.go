@@ -56,6 +56,10 @@ func main() {
 		// Websocket
 		wsService = service.NewWebSocketService(jwt, redisClient)
 
+		// Files
+		fileService = service.NewFileService()
+		fileHandler = handler.NewFileHandler(fileService)
+
 		// User
 		userRepo    = repository.NewUserRepository(db)
 		userService = service.NewUserService(userRepo, zapLogger, jwt)
@@ -75,6 +79,11 @@ func main() {
 		// Message
 		messageService = service.NewMessageService(messageRepo, sessionRepo, userRepo, zapLogger, wsService, jwt, redisClient)
 		messageHandler = handler.NewMessageHandler(messageService)
+
+		// Schedule
+		scheduleRepo    = repository.NewScheduleRepository(db)
+		scheduleService = service.NewScheduleService(scheduleRepo, userRepo, zapLogger, jwt)
+		scheduleHandler = handler.NewScheduleHandler(scheduleService)
 	)
 
 	server := gin.Default()
@@ -84,10 +93,12 @@ func main() {
 	server.GET("/ws", wsService.HandleWebSocket)
 	// Other route
 	routes.Auth(server, authHandler, jwt)
+	routes.File(server, fileHandler, jwt)
 	routes.User(server, userHandler, jwt)
 	routes.Notification(server, notificationHandler, jwt)
 	routes.Session(server, sessionHandler, jwt)
 	routes.Message(server, messageHandler, jwt)
+	routes.Schedule(server, scheduleHandler, jwt)
 
 	server.Static("/uploads", "./uploads")
 
