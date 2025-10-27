@@ -120,7 +120,6 @@ func (ms *messageService) Send(ctx context.Context, req dto.SendMessageRequest, 
 		IsText:    req.IsText,
 		Text:      req.Text,
 		FileURL:   req.FileURL,
-		FileType:  req.FileType,
 		Sender: dto.CustomUserResponse{
 			ID:   user.ID,
 			Role: string(user.Role),
@@ -260,11 +259,10 @@ func (ms *messageService) List(ctx context.Context, req response.PaginationReque
 	var datas []dto.MessageResponse
 	for _, message := range dataWithPaginate.Messages {
 		data := dto.MessageResponse{
-			ID:       message.ID,
-			IsText:   message.IsText,
-			Text:     message.Text,
-			FileURL:  message.FileURL,
-			FileType: message.FileType,
+			ID:      message.ID,
+			IsText:  &message.IsText,
+			Text:    message.Text,
+			FileURL: message.FileURL,
 			Sender: dto.CustomUserResponse{
 				ID:   message.Sender.ID,
 				Role: string(message.Sender.Role),

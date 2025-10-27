@@ -1054,11 +1054,10 @@ func (ss *sessionService) End(ctx context.Context, sessionID string) (*dto.Sessi
 
 	for _, msg := range *messages {
 		data := dto.MessageSummary{
-			ID:       msg.MessageID,
-			IsText:   msg.IsText,
-			Text:     msg.Text,
-			FileURL:  msg.FileURL,
-			FileType: msg.FileType,
+			ID:      msg.MessageID,
+			IsText:  *msg.IsText,
+			Text:    msg.Text,
+			FileURL: msg.FileURL,
 			Sender: dto.CustomUserResponse{
 				ID:         msg.Sender.ID,
 				Name:       msg.Sender.Name,

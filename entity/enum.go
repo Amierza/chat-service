@@ -3,10 +3,11 @@ package entity
 import "github.com/Amierza/chat-service/constants"
 
 type (
-	Role          string
-	Degree        string
-	Progress      string
-	SessionStatus string
+	Role           string
+	Degree         string
+	Progress       string
+	SessionStatus  string
+	ScheduleStatus string
 )
 
 const (
@@ -14,6 +15,10 @@ const (
 	LECTURER           Role = constants.ENUM_ROLE_LECTURER
 	PRIMARY_LECTURER   Role = constants.ENUM_ROLE_PRIMARY_LECTURER
 	SECONDARY_LECTURER Role = constants.ENUM_ROLE_SECONDARY_LECTURER
+
+	SCHEDULE_PENDING  ScheduleStatus = constants.ENUM_SCHEDULE_STATUS_PENDING
+	SCHEDULE_APPROVED ScheduleStatus = constants.ENUM_SCHEDULE_STATUS_APPROVED
+	SCHEDULE_REJECTED ScheduleStatus = constants.ENUM_SCHEDULE_STATUS_REJECTED
 
 	S1 Degree = constants.ENUM_DEGREE_S1
 	S2 Degree = constants.ENUM_DEGREE_S2
@@ -40,4 +45,7 @@ func IsValidProgress(p Progress) bool {
 }
 func IsValidSessionStatus(ss SessionStatus) bool {
 	return ss == WAITING || ss == ONGOING || ss == FINISHED
+}
+func IsValidScheduleStatus(ss ScheduleStatus) bool {
+	return ss == SCHEDULE_PENDING || ss == SCHEDULE_APPROVED || ss == SCHEDULE_REJECTED
 }

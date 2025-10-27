@@ -7,6 +7,7 @@ import (
 
 func Rollback(db *gorm.DB) error {
 	tables := []interface{}{
+		&entity.Schedule{},
 		&entity.Note{},
 		&entity.Message{},
 		&entity.Session{},

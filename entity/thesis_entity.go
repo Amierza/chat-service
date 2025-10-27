@@ -14,6 +14,7 @@ type Thesis struct {
 	ThesisLogs  []ThesisLog        `gorm:"foreignKey:ThesisID;constraint:OnDelete:CASCADE;" json:"thesis_logs"`
 	Sessions    []Session          `gorm:"foreignKey:ThesisID;constraint:OnDelete:CASCADE;" json:"sessions"`
 	Supervisors []ThesisSupervisor `gorm:"foreignKey:ThesisID;constraint:OnDelete:CASCADE;" json:"supervisors"`
+	Schedules   []Schedule         `gorm:"foreignKey:ThesisID;constraint:OnDelete:CASCADE;" json:"schedules"`
 
 	StudentID uuid.UUID `gorm:"type:uuid;index" json:"student_id,omitempty"`
 	Student   Student   `gorm:"foreignKey:StudentID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"student,omitempty"`

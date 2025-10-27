@@ -22,6 +22,9 @@ type Session struct {
 	UserIDOwner uuid.UUID `gorm:"type:uuid;index" json:"user_id_owner"`
 	UserOwner   User      `gorm:"foreignKey:UserIDOwner;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"user_start"`
 
+	// ScheduleID *uuid.UUID `gorm:"type:uuid;index" json:"schedule_id,omitempty"`
+	// Schedule   *Schedule  `gorm:"foreignKey:ScheduleID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"schedule,omitempty"`
+
 	TimeStamp
 }
 

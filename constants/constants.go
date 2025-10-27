@@ -24,4 +24,8 @@ const (
 	ENUM_SESSION_STATUS_ONGOING            = "ongoing"
 	ENUM_SESSION_STATUS_PROCESSING_SUMMARY = "processing_summary"
 	ENUM_SESSION_STATUS_FINSIHED           = "finished"
+
+	ENUM_SCHEDULE_STATUS_PENDING  = "pending"
+	ENUM_SCHEDULE_STATUS_APPROVED = "approved"
+	ENUM_SCHEDULE_STATUS_REJECTED = "rejected"
 )
