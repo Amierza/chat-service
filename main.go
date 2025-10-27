@@ -65,6 +65,11 @@ func main() {
 		userService = service.NewUserService(userRepo, zapLogger, jwt)
 		userHandler = handler.NewUserHandler(userService)
 
+		// Thesis
+		thesisRepo    = repository.NewThesisRepository(db)
+		thesisService = service.NewThesisService(thesisRepo, userRepo, zapLogger, jwt)
+		thesisHandler = handler.NewThesisHandler(thesisService)
+
 		// Notification
 		notificationRepo    = repository.NewNotificationRepository(db)
 		notificationService = service.NewNotificationService(notificationRepo, zapLogger, jwt)
@@ -95,6 +100,7 @@ func main() {
 	routes.Auth(server, authHandler, jwt)
 	routes.File(server, fileHandler, jwt)
 	routes.User(server, userHandler, jwt)
+	routes.Thesis(server, thesisHandler, jwt)
 	routes.Notification(server, notificationHandler, jwt)
 	routes.Session(server, sessionHandler, jwt)
 	routes.Message(server, messageHandler, jwt)
